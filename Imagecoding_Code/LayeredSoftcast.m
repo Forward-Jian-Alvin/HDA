@@ -16,12 +16,19 @@ x_dct = dct2(img_ori-128);
 xRem=rem(x_dct,QStep);
 x_int=(x_dct-xRem)/QStep;
 % x_intreshape=reshape(x_int(1:bh,1:bw),1,bh*bw);
-x_zigzag=zigzag(x_int(1:bh,1:bw));
+x_zigzag=zigzag(x_int(:,:));
 % x_dec=reshape(invzigzag(x_enc,bh,bw),1,bh*bw);
-x_enc=RLE_enc(x_zigzag);% mark1:最后一个数一定是0的个数，我们不用，decode的时候直接补0
-[x_encSort,Ind] = sort(x_enc(1:end-1),'descend');
-for ii=1:length(x_enc);
-    numbin=dec2binPN(x_enc(ii),N);
+if QStep>10
+    x_encDigi=RLE_enc(x_zigzag);% mark1:最后一个数一定是0的个数，我们不用，decode的时候直接补0
+else
+    x_encDigi=x_zigzag;
+end
+% [x_encSort,Ind] = sort(x_encDigi(1:end-1),'descend');
+N=12;
+x_enc=[];
+for ii=1:length(x_encDigi)-1;
+    numbin=dec2binPN(x_encDigi(ii),N);
+    x_enc = numbin;
 end
 
 %% FEC+Modulation
