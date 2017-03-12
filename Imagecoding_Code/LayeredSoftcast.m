@@ -97,7 +97,7 @@ AnaTx=AnaSignal(1:2:end)+AnaSignal(end:-2:2)*1i;
 TxData=[modSignal.'  AnaTx];
 % papr=cal_papr(y)
 %% awgn channel
-snrindex= 20;
+snrindex= 25;
 for kk=1:length(snrindex)
         snr=snrindex(kk);
         Ps = 1;%mean(mean(y.*y));
@@ -126,6 +126,8 @@ for kk=1:length(snrindex)
             'BitOutput',true, 'NormalizationMethod','Average power', ...
             'DecisionMethod','Log-likelihood ratio', 'Variance',noise_pow);
         demodSignal = step(hDemod,RxDigi.');
+        demodSignal(demodSignal>100)=100;
+        demodSignal(demodSignal<-100)=-100;
         receivedBits = step(hTDec,-demodSignal);
         Err=TxD-receivedBits;
         Ber=length(find(Err~=0))/length(TxD);
