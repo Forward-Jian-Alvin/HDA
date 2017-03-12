@@ -132,8 +132,14 @@ for kk=1:length(snrindex)
         if(Ber~=0)
             disp('Digital decode Error Exist!');
         end
-%         x_dec=RLE_dec(x_enc);
-%         x_dec=reshape(invzigzag(x_dec,bh,bw),1,bh*bw);
+        decodeValue=[];
+        for ii=1:length(receivedBits)/N
+            binIn=reshape(char(receivedBits((ii-1)*N+1:ii*N)+'0'),1,[]);
+            decodeValue=[decodeValue bin2decPN(binIn,N)];
+        end
+        decodeValue = [decodeValue height*width-sum(decodeValue(2:2:end))];
+        x_dec=RLE_dec(decodeValue);
+        x_dec=invzigzag(x_dec,height,width);
 % step3 : decode analog  
       
         for ii=1:block_Num
@@ -154,7 +160,7 @@ for kk=1:length(snrindex)
         end
         imshow(idct2(z1)+128,[]);
 %% fill edges
-        z2=z1+x_int*QStep;%64*12288
+        z2=z1+x_dec*QStep;%64*12288
         %
         xx=idct2(z2)+128;
         xx(xx<0)=0;
